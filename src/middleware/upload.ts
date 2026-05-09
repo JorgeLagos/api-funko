@@ -3,6 +3,9 @@ import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { cloudinary } from '../config/cloudinary';
 import { ValidationError } from '../errors/app-error';
 
+// dev/ en desarrollo, prod/ en producción
+const envPrefix = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
+
 const imageFilter = (_req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   if (allowed.includes(file.mimetype)) {
@@ -16,9 +19,9 @@ const imageFilter = (_req: any, file: Express.Multer.File, cb: multer.FileFilter
 const funkoStorage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder:         'api-funko/funkos',
+    folder:          `${envPrefix}/api-funko/funkos`,
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
-    transformation: [{ width: 800, height: 800, crop: 'limit', quality: 'auto' }],
+    transformation:  [{ width: 800, height: 800, crop: 'limit', quality: 'auto' }],
   } as any,
 });
 
@@ -32,7 +35,7 @@ export const uploadFunkoImage = multer({
 const seriesStorage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder:          'api-funko/series',
+    folder:          `${envPrefix}/api-funko/series`,
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
     transformation:  [{ width: 800, height: 800, crop: 'limit', quality: 'auto' }],
   } as any,

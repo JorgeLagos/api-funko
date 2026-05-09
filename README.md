@@ -34,8 +34,7 @@ api-funko/
 │   │   ├── collection/   # Colección personal del usuario
 │   │   ├── funko/        # CRUD de Funkos
 │   │   ├── series/       # CRUD de Series
-│   │   ├── health/       # Health check
-│   │   └── import/       # Importación masiva
+│   │   └── health/       # Health check
 │   ├── routes/           # Registro centralizado de rutas
 │   ├── utils/            # Helpers (apiResponse, etc.)
 │   ├── app.ts            # Configuración de Express
