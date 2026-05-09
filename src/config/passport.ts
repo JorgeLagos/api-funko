@@ -9,7 +9,7 @@ passport.use(
     {
       clientID:     env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
-      callbackURL:  `http://localhost:${env.PORT}/auth/google/callback`,
+      callbackURL:  `${env.BACKEND_URL}/auth/google/callback`,
     },
     async (_accessToken, _refreshToken, profile: Profile, done) => {
       try {
