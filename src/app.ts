@@ -41,6 +41,17 @@ app.use(morgan('short', { stream: morganStream }));
 // --- Archivos estáticos (imágenes de funkos) ---
 app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads')));
 
+// --- Ruta raíz ---
+app.get('/', (_req, res) => {
+  res.json({
+    name:    'API Funko',
+    version: '1.0.0',
+    status:  'online',
+    env:     env.NODE_ENV,
+    docs:    '/api/health',
+  });
+});
+
 // --- Rutas Auth (fuera del prefijo /api para OAuth redirect limpio) ---
 app.use('/auth', authRoutes);
 
