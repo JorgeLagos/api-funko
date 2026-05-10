@@ -11,6 +11,8 @@ const startServer = async () => {
     logger.info(`🚀 Servidor corriendo en http://localhost:${env.PORT}`);
     logger.info(`📋 Health check: http://localhost:${env.PORT}/api/health`);
     logger.info(`🌍 Entorno: ${env.NODE_ENV}`);
+    logger.info(`🔗 FRONTEND_URL: ${env.FRONTEND_URL}`);
+    logger.info(`🔗 BACKEND_URL: ${env.BACKEND_URL}`);
   });
 
   // --- Graceful Shutdown ---
