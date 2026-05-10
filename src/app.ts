@@ -13,6 +13,9 @@ import { authRoutes } from './modules/auth/auth.routes';
 
 const app = express();
 
+// --- Trust proxy (Railway, Heroku, etc. usan reverse proxy) ---
+app.set('trust proxy', 1);
+
 // --- Seguridad y middlewares globales ---
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors({
