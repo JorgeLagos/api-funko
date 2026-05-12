@@ -21,7 +21,7 @@ interface ApiResponseOptions<T> {
 const transformIds = (value: any): any => {
   // Convertir Mongoose Documents a objetos planos antes de procesar
   if (value !== null && typeof value === 'object' && typeof value.toObject === 'function') {
-    value = value.toObject({ virtuals: false });
+    value = value.toObject({ virtuals: true });
   }
 
   if (Array.isArray(value)) {

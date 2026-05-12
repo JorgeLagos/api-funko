@@ -1,5 +1,6 @@
 import { Funko, IFunko } from '../../models/funko.model';
 import { Series } from '../../models/series.model';
+import { UserCollection } from '../../models/user-collection.model';
 import { CreateFunkoDto, UpdateFunkoDto, FunkoQueryDto } from './funko.dto';
 import { NotFoundError } from '../../errors/app-error';
 import { cloudinary } from '../../config/cloudinary';
@@ -125,8 +126,10 @@ export class FunkoService {
   }
 
   async getStats() {
-    const [totalFunkos, seriesStats] = await Promise.all([
+    const [totalFunkos, totalSeries, totalUsers, seriesStats, usersBySeries] = await Promise.all([
       Funko.countDocuments(),
+      Series.countDocuments(),
+      UserCollection.distinct('userId').then((ids) => ids.length),
       Funko.aggregate([
         {
           $group: {
@@ -153,11 +156,36 @@ export class FunkoService {
         },
         { $sort: { total: -1 } },
       ]),
+      // Usuarios por serie
+      UserCollection.aggregate([
+        {
+          $lookup: {
+            from: 'series',
+            localField: 'seriesId',
+            foreignField: '_id',
+            as: 'seriesInfo',
+          },
+        },
+        { $unwind: '$seriesInfo' },
+        {
+          $group: {
+            _id: '$seriesId',
+            series: { $first: '$seriesInfo.name' },
+            slug: { $first: '$seriesInfo.slug' },
+            users: { $sum: 1 },
+          },
+        },
+        { $project: { _id: 0, series: 1, slug: 1, users: 1 } },
+        { $sort: { users: -1 } },
+      ]),
     ]);
 
     return {
       totalFunkos,
+      totalSeries,
+      totalUsers,
       bySeriesStats: seriesStats,
+      usersBySeries,
     };
   }
 }
