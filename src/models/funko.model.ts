@@ -1,14 +1,10 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import { VARIANT_KEYS, VARIANT_DEFAULTS, VariantsMap } from '../config/variants.config';
 
-// --- Interfaz de variante (derivada del config) ---
-export type IFunkoVariant = VariantsMap;
+// --- Tipo flexible: cualquier clave booleana ---
+export type IFunkoVariant = Record<string, boolean>;
 
-// --- Schema dinámico generado desde el config ---
-const variantFields: Record<string, object> = Object.fromEntries(
-  VARIANT_KEYS.map((k: string) => [k, { type: Boolean, default: false }])
-);
-const funkoVariantSchema = new Schema<IFunkoVariant>(variantFields as any, { _id: false });
+// --- Schema abierto: acepta cualquier campo booleano sin necesidad de declararlo ---
+const funkoVariantSchema = new Schema<IFunkoVariant>({}, { _id: false, strict: false });
 
 // --- Documento principal: Funko ---
 export interface IFunko extends Document {
@@ -33,7 +29,7 @@ const funkoSchema = new Schema<IFunko>(
     type:       { type: String, default: 'Pop', trim: true },
     series:     { type: Schema.Types.ObjectId, ref: 'Series', required: true, index: true },
     barcode:    { type: Number },
-    variants:   { type: funkoVariantSchema, default: () => ({ ...VARIANT_DEFAULTS }) },
+    variants:   { type: funkoVariantSchema, default: () => ({}) },
     imageUrl:   { type: String },
     boxImageUrl:{ type: String },
     store:      { type: String, trim: true },

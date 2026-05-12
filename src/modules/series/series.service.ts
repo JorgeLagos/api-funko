@@ -7,7 +7,7 @@ import { cloudinary } from '../../config/cloudinary';
 
 export class SeriesService {
   async findAll(): Promise<ISeries[]> {
-    return Series.find().populate('funkoCount').sort({ name: 1 }).lean();
+    return Series.find().populate('funkoCount').sort({ name: 1 }) as any;
   }
 
   async findById(id: string): Promise<ISeries> {

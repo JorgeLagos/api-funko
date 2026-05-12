@@ -9,9 +9,11 @@ export async function getUserCollection(userId: string) {
     .populate('seriesId', 'name slug imageUrl')
     .lean();
 
-  // Para cada serie, obtener el total de funkos
+  // Filtra entradas huérfanas donde la serie fue eliminada de la DB
+  const validEntries = entries.filter((e) => e.seriesId != null);
+
   const result = await Promise.all(
-    entries.map(async (entry) => {
+    validEntries.map(async (entry) => {
       const seriesId = entry.seriesId as any;
       const total = await Funko.countDocuments({ series: seriesId._id });
       return {

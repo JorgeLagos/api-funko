@@ -2,8 +2,6 @@ import { Funko, IFunko } from '../../models/funko.model';
 import { Series } from '../../models/series.model';
 import { CreateFunkoDto, UpdateFunkoDto, FunkoQueryDto } from './funko.dto';
 import { NotFoundError } from '../../errors/app-error';
-import { v4 as uuidv4 } from 'uuid';
-import { VARIANT_KEYS } from '../../config/variants.config';
 import { cloudinary } from '../../config/cloudinary';
 
 interface PaginatedResult {
@@ -20,9 +18,12 @@ export class FunkoService {
   async findAll(query: FunkoQueryDto): Promise<PaginatedResult> {
     const filter: Record<string, any> = {};
 
-    // Filtrar por serie (usando slug)
+    // Filtrar por serie (usando ObjectId o slug)
     if (query.series) {
-      const series = await Series.findOne({ slug: query.series });
+      const isObjectId = /^[a-f\d]{24}$/i.test(query.series);
+      const series = isObjectId
+        ? await Series.findById(query.series)
+        : await Series.findOne({ slug: query.series });
       if (series) {
         filter.series = series._id;
       } else {
@@ -35,10 +36,10 @@ export class FunkoService {
       filter.name = { $regex: query.search, $options: 'i' };
     }
 
-    // Filtros de variantes — generados dinámicamente desde el config
+    // Filtros de variantes dinámicos — cualquier param is* con valor 'true'
     const q = query as Record<string, unknown>;
-    for (const key of VARIANT_KEYS) {
-      if (q[key] === 'true') filter[`variants.${key}`] = true;
+    for (const key of Object.keys(q)) {
+      if (key.startsWith('is') && q[key] === 'true') filter[`variants.${key}`] = true;
     }
 
     // Paginación
@@ -73,7 +74,7 @@ export class FunkoService {
   }
 
   async create(data: CreateFunkoDto): Promise<IFunko> {
-    return Funko.create(data);
+    return Funko.create(data as any);
   }
 
   async update(id: string, data: UpdateFunkoDto): Promise<IFunko> {
