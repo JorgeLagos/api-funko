@@ -25,7 +25,7 @@ const FUNKO_VARIANTS: FunkoVariantDto[] = [
   { key: 'isFlocked', label: 'Flocked', color: '#9B59B6' },
   { key: 'isMetallic', label: 'Metallic', color: '#A8A9AD' },
   { key: 'isDiamond', label: 'Diamond', color: '#67E8F9' },
-  { key: 'isScented', label: 'Scented', color: '#F472B6' },
+  { key: 'isScented', label: 'Scented', color: '#5B9E7D' },
   { key: 'isChrome', label: 'Chrome', color: '#C0C0C0' },
 ];
 
