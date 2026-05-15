@@ -45,7 +45,7 @@ export class FunkoService {
 
     // Paginación
     const page = Math.max(1, query.page);
-    const limit = Math.min(100, Math.max(1, query.limit));
+    const limit = Math.min(10000, Math.max(1, query.limit));
     const skip = (page - 1) * limit;
 
     // Ordenamiento
