@@ -29,7 +29,8 @@ export class SeriesService {
   }
 
   async update(id: string, data: UpdateSeriesDto): Promise<ISeries> {
-    const series = await Series.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+    const series = await Series.findByIdAndUpdate(id, data, { returnDocument: 'after', runValidators: true });
+
     if (!series) throw new NotFoundError('Serie');
     return series;
   }

@@ -1,7 +1,8 @@
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { UserCollection } from '../../models/user-collection.model';
 import { Series } from '../../models/series.model';
 import { Funko } from '../../models/funko.model';
+import { Store } from '../../models/store.model';
 
 /** Obtiene todas las series del usuario con progreso (owned/total) */
 export async function getUserCollection(userId: string) {
@@ -36,7 +37,8 @@ export async function addSeriesToCollection(userId: string, seriesId: string) {
   const entry = await UserCollection.findOneAndUpdate(
     { userId, seriesId },
     { userId, seriesId },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
+    { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
+
   );
 
   return entry;
@@ -52,11 +54,29 @@ export async function getSeriesChecklist(userId: string, seriesSlug: string) {
   const series = await Series.findOne({ slug: seriesSlug });
   if (!series) throw new Error('Serie no encontrada');
 
-  // Funkos del catálogo global (del admin)
+  // Funkos del catálogo global (sin populate para evitar CastError)
   const funkos = await Funko.find({ series: series._id })
     .select('funkoId name imageUrl variants type store')
     .sort({ funkoId: 1 })
     .lean();
+
+  // Lookup seguro de stores: solo ObjectIds válidos
+  const validStoreIds = [
+    ...new Set(
+      funkos
+        .map(f => f.store)
+        .filter(s => s && mongoose.isValidObjectId(s))
+        .map(s => String(s))
+    ),
+  ];
+
+  const storeMap = new Map<string, any>();
+  if (validStoreIds.length > 0) {
+    const stores = await Store.find({ _id: { $in: validStoreIds } })
+      .select('name slug color textColor')
+      .lean();
+    stores.forEach(s => storeMap.set((s._id as Types.ObjectId).toString(), s));
+  }
 
   // Estado personal del usuario para esta serie
   const entry = await UserCollection.findOne({
@@ -68,10 +88,13 @@ export async function getSeriesChecklist(userId: string, seriesSlug: string) {
     (entry?.ownedFunkos ?? []).map((id) => id.toString())
   );
 
-  // Combina: cada funko tiene owned: true/false según el usuario
+  // Combina: funko + owned + store resuelto (o null si inválido)
   const checklist = funkos.map((f) => ({
     ...f,
     owned: ownedSet.has((f._id as Types.ObjectId).toString()),
+    store: f.store && mongoose.isValidObjectId(f.store)
+      ? (storeMap.get(String(f.store)) ?? null)
+      : null,
   }));
 
   return { series, checklist, ownedCount: ownedSet.size, totalCount: funkos.length };

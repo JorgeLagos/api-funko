@@ -53,7 +53,7 @@ export class FunkoService {
     sortObj[query.sort] = query.order === 'asc' ? 1 : -1;
 
     const [data, total] = await Promise.all([
-      Funko.find(filter).populate('series', 'name slug').sort(sortObj).skip(skip).limit(limit).lean(),
+      Funko.find(filter).populate('series', 'name slug').populate('store', 'name slug color textColor').sort(sortObj).skip(skip).limit(limit).lean(),
       Funko.countDocuments(filter),
     ]);
 
@@ -69,7 +69,7 @@ export class FunkoService {
   }
 
   async findById(id: string): Promise<IFunko> {
-    const funko = await Funko.findById(id).populate('series', 'name slug').lean();
+    const funko = await Funko.findById(id).populate('series', 'name slug').populate('store', 'name slug color textColor').lean();
     if (!funko) throw new NotFoundError('Funko');
     return funko as IFunko;
   }
@@ -79,7 +79,8 @@ export class FunkoService {
   }
 
   async update(id: string, data: UpdateFunkoDto): Promise<IFunko> {
-    const funko = await Funko.findByIdAndUpdate(id, data, { new: true, runValidators: true }).populate(
+    const funko = await Funko.findByIdAndUpdate(id, data, { returnDocument: 'after', runValidators: true }).populate(
+
       'series',
       'name slug'
     );

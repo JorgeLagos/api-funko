@@ -16,7 +16,7 @@ export interface IFunko extends Document {
   variants: IFunkoVariant;
   imageUrl?: string;
   boxImageUrl?: string;
-  store?: string;
+  store?: Types.ObjectId;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -32,7 +32,7 @@ const funkoSchema = new Schema<IFunko>(
     variants:   { type: funkoVariantSchema, default: () => ({}) },
     imageUrl:   { type: String },
     boxImageUrl:{ type: String },
-    store:      { type: String, trim: true },
+    store:      { type: Schema.Types.ObjectId, ref: 'Store', index: true },
     notes:      { type: String },
   },
   {
