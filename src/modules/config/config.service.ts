@@ -30,6 +30,7 @@ const FUNKO_VARIANTS: FunkoVariantDto[] = [
   { key: 'isDiamond', label: 'Diamond', color: '#67E8F9' },
   { key: 'isScented', label: 'Scented', color: '#5B9E7D' },
   { key: 'isChrome', label: 'Chrome', color: '#C0C0C0' },
+  { key: 'isExclusive', label: 'Exclusive', color: '#FCD24F' },
 ];
 
 // ─── Servicio ─────────────────────────────────────────────────────────────────
