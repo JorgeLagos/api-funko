@@ -15,6 +15,9 @@ const FUNKO_TYPES: FunkoTypeDto[] = [
   { key: 'popRides', label: 'Pop! Rides' },
   { key: 'popDeluxe', label: 'Pop! Deluxe' },
   { key: 'popTown', label: 'Pop! Town' },
+  { key: 'popPlus', label: 'Pop! Plus' },
+  { key: 'popSuper', label: 'Pop! Super' },
+  { key: 'popJumbo', label: 'Pop! Jumbo' },
 ];
 
 // ─── Variantes especiales ─────────────────────────────────────────────────────
