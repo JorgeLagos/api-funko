@@ -11,7 +11,7 @@ export const createFunkoSchema = z.object({
   variants:   variantSchema.optional().default({}),
   imageUrl:   z.string().url().optional(),
   boxImageUrl:z.string().url().optional(),
-  store:      z.string().max(100).optional(),
+  store:      z.string().max(100).nullable().optional(),
   barcode:    z.number().int().positive().optional(),
   notes:      z.string().max(500).optional(),
 });

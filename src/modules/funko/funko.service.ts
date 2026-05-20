@@ -79,11 +79,23 @@ export class FunkoService {
   }
 
   async update(id: string, data: UpdateFunkoDto): Promise<IFunko> {
-    const funko = await Funko.findByIdAndUpdate(id, data, { returnDocument: 'after', runValidators: true }).populate(
+    // Separar campos a limpiar ($unset) de campos a actualizar ($set)
+    const updateOps: Record<string, any> = {};
+    const setFields = { ...data } as Record<string, any>;
+    const unsetFields: Record<string, 1> = {};
 
-      'series',
-      'name slug'
-    );
+    // Si store viene como null / vacío, quitar la referencia del documento
+    if ('store' in setFields && (setFields.store === null || setFields.store === '')) {
+      unsetFields.store = 1;
+      delete setFields.store;
+    }
+
+    if (Object.keys(setFields).length > 0) updateOps.$set = setFields;
+    if (Object.keys(unsetFields).length > 0) updateOps.$unset = unsetFields;
+
+    const funko = await Funko.findByIdAndUpdate(id, updateOps, { returnDocument: 'after', runValidators: true })
+      .populate('series', 'name slug')
+      .populate('store', 'name slug color textColor');
     if (!funko) throw new NotFoundError('Funko');
     return funko;
   }
