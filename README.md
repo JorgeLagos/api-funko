@@ -1,6 +1,6 @@
 # 🎯 API Funko — Backend REST
 
-API REST para la gestión de colecciones de Funko Pops. Construida con **Node.js**, **Express**, **TypeScript** y **MongoDB**.
+API REST para la gestión de colecciones de Funko Pops. Construida con **Node.js**, **Express 5**, **TypeScript** y **MongoDB**.
 
 ---
 
@@ -8,13 +8,14 @@ API REST para la gestión de colecciones de Funko Pops. Construida con **Node.js
 
 | Capa | Tecnología |
 |---|---|
-| Runtime | Node.js |
-| Framework | Express |
-| Lenguaje | TypeScript |
-| Base de datos | MongoDB + Mongoose |
+| Runtime | Node.js 20+ |
+| Package Manager | **pnpm** 11+ |
+| Framework | Express 5 |
+| Lenguaje | TypeScript 6 |
+| Base de datos | MongoDB + Mongoose 9 |
 | Autenticación | JWT + Google OAuth 2.0 (Passport.js) |
 | Almacenamiento de imágenes | Cloudinary |
-| Validación | Zod |
+| Validación | Zod 4 |
 | Logging | Winston + Morgan |
 | Seguridad | Helmet + CORS + Rate Limiting |
 
@@ -27,22 +28,25 @@ api-funko/
 ├── src/
 │   ├── config/           # Configuración (env, cloudinary, passport, logger)
 │   ├── errors/           # Clases de error personalizadas
+│   ├── interfaces/       # Interfaces y tipos centralizados (barrel export)
 │   ├── middleware/       # Auth, rate-limiter, upload, validación
 │   ├── models/           # Modelos Mongoose (Funko, Series, User, Collection)
 │   ├── modules/          # Módulos por dominio
 │   │   ├── auth/         # Login, OAuth, JWT
 │   │   ├── collection/   # Colección personal del usuario
+│   │   ├── config/       # Configuración del frontend (variantes, tipos)
 │   │   ├── funko/        # CRUD de Funkos
+│   │   ├── health/       # Health check
 │   │   ├── series/       # CRUD de Series
-│   │   └── health/       # Health check
+│   │   └── store/        # CRUD de Tiendas (stickers exclusivos)
 │   ├── routes/           # Registro centralizado de rutas
-│   ├── utils/            # Helpers (apiResponse, etc.)
+│   ├── seeds/            # Seeds de datos iniciales
+│   ├── utils/            # Helpers (apiResponse, xlsx-parser)
 │   ├── app.ts            # Configuración de Express
 │   └── server.ts         # Punto de entrada
-├── public/
-│   └── uploads/          # (legacy) imágenes locales
 ├── .env                  # Variables de entorno (NO commitear)
 ├── .env.example          # Plantilla de variables de entorno
+├── pnpm-lock.yaml        # Lockfile de pnpm
 └── tsconfig.json
 ```
 
@@ -55,8 +59,10 @@ api-funko/
 ```bash
 git clone <repo-url>
 cd api-funko
-npm install
+pnpm install
 ```
+
+> ⚠️ Este proyecto usa **pnpm** exclusivamente. Si intentas `npm install` o `yarn`, será bloqueado por el guard `preinstall`.
 
 ### 2. Configurar variables de entorno
 
@@ -69,14 +75,21 @@ Edita `.env` con tus credenciales reales (ver sección [Variables de Entorno](#v
 ### 3. Ejecutar en desarrollo
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ### 4. Compilar para producción
 
 ```bash
-npm run build
-npm start
+pnpm run build
+pnpm start
+```
+
+### 5. Ejecutar seeds
+
+```bash
+pnpm run seed
+pnpm exec ts-node src/seeds/store.seed.ts
 ```
 
 ---
@@ -156,6 +169,7 @@ Al eliminar una serie o funko, la imagen se elimina automáticamente de Cloudina
 
 ## 🛡️ Seguridad
 
+- **pnpm** — strict dependency isolation, verificación de integridad de paquetes
 - **Helmet** — headers HTTP seguros
 - **CORS** — solo permite el `FRONTEND_URL` configurado
 - **Rate Limiting** — 500 req/min en desarrollo, 120 req/min en producción
