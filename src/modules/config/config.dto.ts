@@ -6,7 +6,12 @@
 export interface FunkoTypeDto {
   key:   string;
   label: string;
-  color?: string;
+  /** Etiqueta corta para el ribbon (ej: "PLUS", "PREMIUM"). Si es null, no se muestra ribbon */
+  ribbonLabel?: string | null;
+  /** Color de fondo del ribbon */
+  ribbonColor?: string | null;
+  /** Color de texto del ribbon (default: #fff) */
+  ribbonTextColor?: string | null;
 }
 
 export interface FunkoVariantDto {

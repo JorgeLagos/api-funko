@@ -10,16 +10,16 @@ import { ConfigResponseDto, FunkoTypeDto, FunkoVariantDto } from './config.dto';
 // ─── Tipos de Funko ───────────────────────────────────────────────────────────
 
 const FUNKO_TYPES: FunkoTypeDto[] = [
-  { key: 'pop', label: 'Pop!' },
-  { key: 'popMoment', label: 'Pop! Moment' },
-  { key: 'popRides', label: 'Pop! Rides' },
-  { key: 'popDeluxe', label: 'Pop! Deluxe' },
-  { key: 'popTown', label: 'Pop! Town' },
-  { key: 'popPlus', label: 'Pop! Plus' },
-  { key: 'popSuper', label: 'Pop! Super' },
-  { key: 'popJumbo', label: 'Pop! Jumbo' },
-  { key: 'popTee', label: 'Pop! & Tee' },
-  { key: 'popPremium', label: 'Pop! Premium' },
+  { key: 'pop', label: 'Pop!', ribbonLabel: null },
+  { key: 'popMoment', label: 'Pop! Moment', ribbonLabel: 'MOMENT', ribbonColor: '#9B8ABF' },
+  { key: 'popRides', label: 'Pop! Rides', ribbonLabel: 'RIDES', ribbonColor: '#9B8ABF' },
+  { key: 'popDeluxe', label: 'Pop! Deluxe', ribbonLabel: 'DELUXE', ribbonColor: '#9B8ABF' },
+  { key: 'popTown', label: 'Pop! Town', ribbonLabel: 'TOWN', ribbonColor: '#9B8ABF' },
+  { key: 'popPlus', label: 'Pop! Plus', ribbonLabel: 'PLUS', ribbonColor: '#9B8ABF' },
+  { key: 'popSuper', label: 'Pop! Super', ribbonLabel: 'SUPER', ribbonColor: '#9B8ABF' },
+  { key: 'popJumbo', label: 'Pop! Jumbo', ribbonLabel: 'JUMBO', ribbonColor: '#9B8ABF' },
+  { key: 'popTee', label: 'Pop! & Tee', ribbonLabel: 'TEE', ribbonColor: '#9B8ABF' },
+  { key: 'popPremium', label: 'Pop! Premium', ribbonLabel: 'PREMIUM', ribbonColor: '#9B8ABF' },
 ];
 
 // ─── Variantes especiales ─────────────────────────────────────────────────────
