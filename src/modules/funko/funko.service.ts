@@ -23,9 +23,18 @@ export class FunkoService {
       }
     }
 
-    // Búsqueda por nombre
+    // Búsqueda por nombre, número de funko o barcode
     if (query.search) {
-      filter.name = { $regex: query.search, $options: 'i' };
+      const term = query.search.trim();
+      const orConditions: Record<string, unknown>[] = [
+        { name: { $regex: term, $options: 'i' } },
+      ];
+      const numericTerm = Number(term);
+      if (!isNaN(numericTerm)) {
+        orConditions.push({ funkoId: numericTerm });
+        orConditions.push({ barcode: numericTerm });
+      }
+      filter.$or = orConditions;
     }
 
     // Filtros de variantes dinámicos — cualquier param is* con valor 'true'

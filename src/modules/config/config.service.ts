@@ -18,6 +18,8 @@ const FUNKO_TYPES: FunkoTypeDto[] = [
   { key: 'popPlus', label: 'Pop! Plus' },
   { key: 'popSuper', label: 'Pop! Super' },
   { key: 'popJumbo', label: 'Pop! Jumbo' },
+  { key: 'popTee', label: 'Pop! & Tee' },
+  { key: 'popPremium', label: 'Pop! Premium' },
 ];
 
 // ─── Variantes especiales ─────────────────────────────────────────────────────
