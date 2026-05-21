@@ -3,6 +3,7 @@ import { UserCollection } from '../../models/user-collection.model';
 import { Series } from '../../models/series.model';
 import { Funko } from '../../models/funko.model';
 import { Store } from '../../models/store.model';
+import { PopulatedSeries } from '../../interfaces';
 
 /** Obtiene todas las series del usuario con progreso (owned/total) */
 export async function getUserCollection(userId: string) {
@@ -15,7 +16,7 @@ export async function getUserCollection(userId: string) {
 
   const result = await Promise.all(
     validEntries.map(async (entry) => {
-      const seriesId = entry.seriesId as any;
+      const seriesId = entry.seriesId as unknown as PopulatedSeries;
       const total = await Funko.countDocuments({ series: seriesId._id });
       return {
         series:     seriesId,
@@ -70,7 +71,7 @@ export async function getSeriesChecklist(userId: string, seriesSlug: string) {
     ),
   ];
 
-  const storeMap = new Map<string, any>();
+  const storeMap = new Map<string, unknown>();
   if (validStoreIds.length > 0) {
     const stores = await Store.find({ _id: { $in: validStoreIds } })
       .select('name slug color textColor')

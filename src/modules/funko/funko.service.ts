@@ -4,20 +4,11 @@ import { UserCollection } from '../../models/user-collection.model';
 import { CreateFunkoDto, UpdateFunkoDto, FunkoQueryDto } from './funko.dto';
 import { NotFoundError } from '../../errors/app-error';
 import { cloudinary } from '../../config/cloudinary';
-
-interface PaginatedResult {
-  data: IFunko[];
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+import { PaginatedResult, CloudinaryFile } from '../../interfaces';
 
 export class FunkoService {
   async findAll(query: FunkoQueryDto): Promise<PaginatedResult> {
-    const filter: Record<string, any> = {};
+    const filter: Record<string, unknown> = {};
 
     // Filtrar por serie (usando ObjectId o slug)
     if (query.series) {
@@ -75,13 +66,13 @@ export class FunkoService {
   }
 
   async create(data: CreateFunkoDto): Promise<IFunko> {
-    return Funko.create(data as any);
+    return Funko.create(data as Record<string, unknown>);
   }
 
   async update(id: string, data: UpdateFunkoDto): Promise<IFunko> {
     // Separar campos a limpiar ($unset) de campos a actualizar ($set)
-    const updateOps: Record<string, any> = {};
-    const setFields = { ...data } as Record<string, any>;
+    const updateOps: Record<string, unknown> = {};
+    const setFields = { ...data } as Record<string, unknown>;
     const unsetFields: Record<string, 1> = {};
 
     // Si store viene como null / vacío, quitar la referencia del documento
@@ -132,7 +123,7 @@ export class FunkoService {
     }
 
     // Cloudinary ya subió la imagen — req.file.path contiene la URL pública
-    funko.imageUrl = (file as any).path;
+    funko.imageUrl = (file as CloudinaryFile).path;
     await funko.save();
     await funko.populate('series', 'name slug');
     return funko;

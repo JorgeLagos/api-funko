@@ -2,23 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
 import { UserRole } from '../models/user.model';
-
-export interface JwtPayload {
-  id:     string;
-  email:  string;
-  name:   string;
-  role:   UserRole;
-  avatar: string;
-}
-
-// Usamos una propiedad propia (authUser) para evitar conflicto con req.user de Passport
-declare global {
-  namespace Express {
-    interface Request {
-      authUser?: JwtPayload;
-    }
-  }
-}
+import { JwtPayload } from '../interfaces';
 
 /** Verifica el JWT en el header Authorization: Bearer <token> */
 export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {

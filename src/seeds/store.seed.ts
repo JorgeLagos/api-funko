@@ -1,6 +1,6 @@
 /**
  * Seed de stickers de tiendas oficiales Funko.
- * Ejecutar: npx ts-node src/seeds/store.seed.ts
+ * Ejecutar: pnpm exec ts-node src/seeds/store.seed.ts
  *
  * Fuentes de colores:
  *  - GameStop:            #FD0000  (brandcolorcode.com / logotyp.us)

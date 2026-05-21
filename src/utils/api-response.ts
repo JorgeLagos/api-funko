@@ -1,26 +1,14 @@
-import { Response } from 'express';
-
-interface ApiResponseOptions<T> {
-  res: Response;
-  statusCode?: number;
-  success?: boolean;
-  message?: string;
-  data?: T;
-  meta?: {
-    page?: number;
-    limit?: number;
-    total?: number;
-    totalPages?: number;
-  };
-}
+import { ApiResponseOptions } from '../interfaces';
 
 /**
  * Transforma recursivamente _id → id en objetos y arrays.
  * También elimina __v de Mongoose.
  */
-const transformIds = (value: any): any => {
+const transformIds = (value: unknown): unknown => {
   // Convertir Mongoose Documents a objetos planos antes de procesar
-  if (value !== null && typeof value === 'object' && typeof value.toObject === 'function') {
+  const hasToObject = (v: unknown): v is { toObject: (opts: Record<string, unknown>) => unknown } =>
+    v !== null && typeof v === 'object' && 'toObject' in v && typeof (v as Record<string, unknown>).toObject === 'function';
+  if (hasToObject(value)) {
     value = value.toObject({ virtuals: true });
   }
 
@@ -29,7 +17,7 @@ const transformIds = (value: any): any => {
   }
 
   if (value !== null && typeof value === 'object') {
-    const transformed: any = {};
+    const transformed: Record<string, unknown> = {};
     for (const [key, val] of Object.entries(value)) {
       if (key === '_id') {
         transformed['id'] = String(val); // ObjectId → string
@@ -53,7 +41,7 @@ export const apiResponse = <T>({
   data,
   meta,
 }: ApiResponseOptions<T>): void => {
-  const response: any = { success };
+  const response: Record<string, unknown> = { success };
   if (message) response.message = message;
   if (data !== undefined) response.data = transformIds(data);
   if (meta) response.meta = meta;

@@ -1,13 +1,13 @@
-import { randomUUID } from 'crypto';
 import { Series, ISeries } from '../../models/series.model';
 import { Funko } from '../../models/funko.model';
 import { CreateSeriesDto, UpdateSeriesDto } from './series.dto';
 import { NotFoundError, ConflictError } from '../../errors/app-error';
 import { cloudinary } from '../../config/cloudinary';
+import { CloudinaryFile } from '../../interfaces';
 
 export class SeriesService {
   async findAll(): Promise<ISeries[]> {
-    return Series.find().populate('funkoCount').sort({ name: 1 }) as any;
+    return Series.find().populate('funkoCount').sort({ name: 1 }).lean() as unknown as ISeries[];
   }
 
   async findById(id: string): Promise<ISeries> {
@@ -68,7 +68,7 @@ export class SeriesService {
     }
 
     // Cloudinary ya subió la imagen — req.file.path contiene la URL pública
-    series.imageUrl = (file as any).path;
+    series.imageUrl = (file as CloudinaryFile).path;
     await series.save();
     return series;
   }

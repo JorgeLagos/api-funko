@@ -41,7 +41,7 @@ export const errorHandler = (
   }
 
   // Error de duplicado de MongoDB (código 11000)
-  if ((err as any).code === 11000) {
+  if ('code' in err && (err as { code: number }).code === 11000) {
     logger.warn(`[409] Duplicate key: ${err.message}`);
     res.status(409).json({
       success: false,

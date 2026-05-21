@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodSchema, ZodError, ZodIssue } from 'zod';
 import { ValidationError } from '../errors/app-error';
 
 export const validate = (schema: ZodSchema) => {
@@ -7,7 +7,7 @@ export const validate = (schema: ZodSchema) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
       const zodError = result.error as ZodError;
-      const messages = zodError.issues.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const messages = zodError.issues.map((e: ZodIssue) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new ValidationError(messages);
     }
     req.body = result.data;
@@ -20,7 +20,7 @@ export const validateQuery = (schema: ZodSchema) => {
     const result = schema.safeParse(req.query);
     if (!result.success) {
       const zodError = result.error as ZodError;
-      const messages = zodError.issues.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const messages = zodError.issues.map((e: ZodIssue) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new ValidationError(messages);
     }
     // Express 5 hace req.query read-only, guardamos en res.locals

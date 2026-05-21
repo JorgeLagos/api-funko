@@ -1,44 +1,12 @@
 import * as XLSX from 'xlsx';
 import path from 'path';
 import { logger } from '../config/logger';
+import { ParsedFunko, ParsedFunkoVariant } from '../interfaces';
 
-export interface RawFunkoRow {
-  funkoId: number;
-  barcode: number;
-  name: string;
-  isChase: boolean;
-  isGlow: boolean;
-  isFlocked: boolean;
-  isMetallic: boolean;
-  isDiamond: boolean;
-  isScented: boolean;
-  type?: string;
-  image?: string;
-  boxs?: string;
-  store?: string;
-}
+// Re-export para mantener compatibilidad con consumidores existentes
+export type { RawFunkoRow, ParsedFunkoVariant, ParsedFunko } from '../interfaces';
 
-export interface ParsedFunkoVariant {
-  isChase: boolean;
-  isGlow: boolean;
-  isFlocked: boolean;
-  isMetallic: boolean;
-  isDiamond: boolean;
-  isScented: boolean;
-}
-
-export interface ParsedFunko {
-  funkoId: number;
-  name: string;
-  type: string;
-  barcode?: number;       // ← A nivel raíz del Funko
-  store?: string;
-  hasImage: boolean;
-  hasBox: boolean;
-  variants: ParsedFunkoVariant[];  // ← Solo flags, sin barcode
-}
-
-const toBool = (value: any): boolean => {
+const toBool = (value: unknown): boolean => {
   if (typeof value === 'boolean') return value;
   if (typeof value === 'string') return value.toLowerCase() === 'true';
   return !!value;
@@ -56,7 +24,7 @@ export const parseXlsxFile = (filePath: string): ParsedFunko[] => {
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
 
-  const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+  const rawData: Record<string, unknown>[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
   // Filtrar filas vacías
   const validRows = rawData.filter(

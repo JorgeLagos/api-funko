@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import { funkoService } from './funko.service';
+import { FunkoQueryDto } from './funko.dto';
 import { apiResponse } from '../../utils/api-response';
 
 export class FunkoController {
   async findAll(req: Request, res: Response) {
-    const query = res.locals.query || req.query;
-    const result = await funkoService.findAll(query as any);
+    const query = (res.locals.query || req.query) as FunkoQueryDto;
+    const result = await funkoService.findAll(query);
     apiResponse({ res, data: result.data, meta: result.meta });
   }
 

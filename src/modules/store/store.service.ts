@@ -5,7 +5,7 @@ import { NotFoundError, ConflictError } from '../../errors/app-error';
 
 export class StoreService {
   async findAll(): Promise<IStore[]> {
-    return Store.find().populate('funkoCount').sort({ name: 1 }) as any;
+    return Store.find().populate('funkoCount').sort({ name: 1 }).lean() as unknown as IStore[];
   }
 
   async findById(id: string): Promise<IStore> {
