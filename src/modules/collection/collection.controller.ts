@@ -25,7 +25,7 @@ export const removeSeries = asyncHandler(async (req: Request, res: Response) => 
   res.json({ success: true, message: 'Serie eliminada de tu colección' });
 });
 
-/** GET /api/collection/:slug/checklist → funkos de una serie con estado owned */
+/** GET /api/collection/:slug/checklist → funkos de una serie con estado */
 export const getChecklist = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.authUser!.id;
   const slug   = req.params['slug'] as string;
@@ -33,12 +33,16 @@ export const getChecklist = asyncHandler(async (req: Request, res: Response) => 
   res.json({ success: true, data });
 });
 
-/** PUT /api/collection/:seriesId/funkos/:funkoId → toggle owned */
-export const toggleFunko = asyncHandler(async (req: Request, res: Response) => {
+/**
+ * PUT /api/collection/:seriesId/funkos/:funkoId
+ * Body: { status: 'owned' | 'notInterested' | 'inStore' | 'none' }
+ */
+export const setFunkoStatus = asyncHandler(async (req: Request, res: Response) => {
   const userId   = req.authUser!.id;
   const seriesId = req.params['seriesId'] as string;
   const funkoId  = req.params['funkoId']  as string;
-  const data = await collectionService.toggleFunkoOwned(userId, seriesId, funkoId);
+  const status   = req.body?.status ?? 'none';
+  const data = await collectionService.setFunkoStatus(userId, seriesId, funkoId, status);
   res.json({ success: true, data });
 });
 

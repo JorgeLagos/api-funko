@@ -5,7 +5,7 @@ import {
   addSeries,
   removeSeries,
   getChecklist,
-  toggleFunko,
+  setFunkoStatus,
   resetFunkos,
 } from './collection.controller';
 
@@ -18,7 +18,7 @@ router.get('/',                                  getMyCollection);
 router.post('/:seriesId',                        addSeries);
 router.delete('/:seriesId',                      removeSeries);
 router.get('/:slug/checklist',                   getChecklist);
-router.put('/:seriesId/funkos/:funkoId',         toggleFunko);
+router.put('/:seriesId/funkos/:funkoId',         setFunkoStatus);
 router.put('/:seriesId/reset',                   resetFunkos);
 
 export const collectionRoutes = router;

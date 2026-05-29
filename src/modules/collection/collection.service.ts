@@ -5,6 +5,8 @@ import { Funko } from '../../models/funko.model';
 import { Store } from '../../models/store.model';
 import { PopulatedSeries } from '../../interfaces';
 
+export type FunkoStatus = 'owned' | 'notInterested' | 'inStore' | 'none';
+
 /** Obtiene todas las series del usuario con progreso (owned/total) */
 export async function getUserCollection(userId: string) {
   const entries = await UserCollection.find({ userId })
@@ -50,7 +52,7 @@ export async function removeSeriesFromCollection(userId: string, seriesId: strin
   await UserCollection.deleteOne({ userId, seriesId });
 }
 
-/** Obtiene los Funkos de una serie con el estado owned del usuario */
+/** Obtiene los Funkos de una serie con el estado del usuario */
 export async function getSeriesChecklist(userId: string, seriesSlug: string) {
   const series = await Series.findOne({ slug: seriesSlug });
   if (!series) throw new Error('Serie no encontrada');
@@ -88,42 +90,75 @@ export async function getSeriesChecklist(userId: string, seriesSlug: string) {
   const ownedSet = new Set(
     (entry?.ownedFunkos ?? []).map((id) => id.toString())
   );
+  const notInterestedSet = new Set(
+    (entry?.notInterestedFunkos ?? []).map((id) => id.toString())
+  );
+  const inStoreSet = new Set(
+    (entry?.inStoreFunkos ?? []).map((id) => id.toString())
+  );
 
-  // Combina: funko + owned + store resuelto (o null si inválido)
-  const checklist = funkos.map((f) => ({
-    ...f,
-    owned: ownedSet.has((f._id as Types.ObjectId).toString()),
-    store: f.store && mongoose.isValidObjectId(f.store)
-      ? (storeMap.get(String(f.store)) ?? null)
-      : null,
-  }));
+  // Combina: funko + estado + store resuelto (o null si inválido)
+  const checklist = funkos.map((f) => {
+    const fid = (f._id as Types.ObjectId).toString();
+    return {
+      ...f,
+      owned:         ownedSet.has(fid),
+      notInterested: notInterestedSet.has(fid),
+      inStore:       inStoreSet.has(fid),
+      store: f.store && mongoose.isValidObjectId(f.store)
+        ? (storeMap.get(String(f.store)) ?? null)
+        : null,
+    };
+  });
 
-  return { series, checklist, ownedCount: ownedSet.size, totalCount: funkos.length };
+  return {
+    series,
+    checklist,
+    ownedCount:   ownedSet.size,
+    inStoreCount: inStoreSet.size,
+    totalCount:   funkos.length,
+  };
 }
 
-/** Toggle: marca o desmarca un Funko como owned para el usuario */
-export async function toggleFunkoOwned(userId: string, seriesId: string, funkoId: string) {
+/** Establece el estado de un Funko para el usuario (con exclusión mutua) */
+export async function setFunkoStatus(
+  userId: string,
+  seriesId: string,
+  funkoId: string,
+  status: FunkoStatus
+) {
   const entry = await UserCollection.findOne({ userId, seriesId });
   if (!entry) throw new Error('Serie no en tu colección');
 
   const funkoObjId = new Types.ObjectId(funkoId);
-  const alreadyOwned = entry.ownedFunkos.some((id) => id.equals(funkoObjId));
 
-  if (alreadyOwned) {
-    entry.ownedFunkos = entry.ownedFunkos.filter((id) => !id.equals(funkoObjId));
-  } else {
-    entry.ownedFunkos.push(funkoObjId);
-  }
+  // Quitar de todos los arrays primero (exclusión mutua)
+  entry.ownedFunkos         = entry.ownedFunkos.filter((id) => !id.equals(funkoObjId));
+  entry.notInterestedFunkos = (entry.notInterestedFunkos ?? []).filter((id) => !id.equals(funkoObjId));
+  entry.inStoreFunkos       = (entry.inStoreFunkos ?? []).filter((id) => !id.equals(funkoObjId));
+
+  // Agregar al array correspondiente
+  if (status === 'owned')         entry.ownedFunkos.push(funkoObjId);
+  else if (status === 'notInterested') entry.notInterestedFunkos.push(funkoObjId);
+  else if (status === 'inStore')  entry.inStoreFunkos.push(funkoObjId);
 
   await entry.save();
-  return { owned: !alreadyOwned, funkoId, ownedCount: entry.ownedFunkos.length };
+
+  return {
+    status,
+    funkoId,
+    ownedCount:   entry.ownedFunkos.length,
+    inStoreCount: (entry.inStoreFunkos ?? []).length,
+  };
 }
 
-/** Resetea todos los funkos owned de una serie (desmarca todos) */
+/** Resetea todos los estados de una serie (desmarca todos) */
 export async function resetSeriesFunkos(userId: string, seriesId: string) {
   const entry = await UserCollection.findOne({ userId, seriesId });
   if (!entry) throw new Error('Serie no en tu colección');
-  entry.ownedFunkos = [];
+  entry.ownedFunkos         = [];
+  entry.notInterestedFunkos = [];
+  entry.inStoreFunkos       = [];
   await entry.save();
-  return { ownedCount: 0 };
+  return { ownedCount: 0, inStoreCount: 0 };
 }
