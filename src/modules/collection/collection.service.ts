@@ -20,11 +20,14 @@ export async function getUserCollection(userId: string) {
     validEntries.map(async (entry) => {
       const seriesId = entry.seriesId as unknown as PopulatedSeries;
       const total = await Funko.countDocuments({ series: seriesId._id });
+      const owned         = entry.ownedFunkos.length;
+      const notInterested = (entry.notInterestedFunkos ?? []).length;
       return {
-        series:     seriesId,
-        owned:      entry.ownedFunkos.length,
+        series:      seriesId,
+        owned,
+        notInterested,
         total,
-        percentage: total > 0 ? Math.round((entry.ownedFunkos.length / total) * 100) : 0,
+        percentage: total > 0 ? Math.round(((owned + notInterested) / total) * 100) : 0,
       };
     })
   );
